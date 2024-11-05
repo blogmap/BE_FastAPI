@@ -7,14 +7,14 @@ router = APIRouter()
 @router.post("/search")
 async def search(request: SearchRequest):
     try:
-        results = search_in_qdrant(request.content)
+        collection_name = "post"
+        results = search_in_qdrant(collection_name, request.content, request.limit)
         return {
             "results": [
                 {
                     "title": result.payload['title'],
-                    "url": f"https://en.wikipedia.org/wiki/{result.payload['title'].replace(' ', '_')}",
                     "similarity": result.score,
-                    "text": result.payload['text']
+                    "content": result.payload['content']
                 }
                 for result in results
             ]

@@ -1,22 +1,20 @@
 from qdrant_client import QdrantClient
 from qdrant_client.http import models as qmodels
 import numpy as np
-
-# Kết nối với Qdrant
+import uuid
+# Connect to Qdrant
 qdrant_client = QdrantClient(host="localhost", port=6333)
 
-# Hàm tạo collection
 def create_collection(collection_name, vector_size):
     qdrant_client.recreate_collection(
         collection_name=collection_name,
         vectors_config=qmodels.VectorParams(size=vector_size, distance="Cosine"),
     )
 
-# Hàm thêm vector embeddings vào Qdrant
 def insert_embeddings(collection_name, embeddings, payloads):
     points = [
         qmodels.PointStruct(
-            id=idx,
+            id=str(uuid.uuid4()),
             vector=embedding.tolist(),
             payload=payload
         )
@@ -27,11 +25,10 @@ def insert_embeddings(collection_name, embeddings, payloads):
         points=points
     )
 
-# Hàm tìm kiếm dựa trên vector embedding
-def search_embeddings(collection_name, query_embedding, top_k=5):
+def search_embeddings(collection_name, query_embedding, limit):
     search_result = qdrant_client.search(
         collection_name=collection_name,
         query_vector=query_embedding.tolist(),
-        limit=top_k
+        limit= limit
     )
     return search_result
